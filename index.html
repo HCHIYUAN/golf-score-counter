@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金銀銅鐵計分器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .score-cell {
+            padding: 8px 6px;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-3xl shadow-xl p-8 w-full max-w-4xl mx-auto border border-gray-200">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">金銀銅鐵計分器</h1>
+        
+        <!-- 玩家姓名與遊戲設定區塊 -->
+        <div class="bg-gray-50 p-6 rounded-2xl mb-6 border border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">遊戲設定</h2>
+            <div id="playerNameInputs" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- 玩家姓名輸入欄位將由 JS 插入 -->
+            </div>
+        </div>
+
+        <!-- 分數設定區塊 -->
+        <div id="pointSettingsSection" class="bg-gray-50 p-6 rounded-2xl mb-6 border border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">分數設定</h2>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <!-- 切 -->
+                <div class="flex flex-col">
+                    <label for="point-cut" class="text-sm font-medium text-gray-600">切</label>
+                    <input type="number" id="point-cut" value="150" min="10" max="500" class="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-center">
+                </div>
+                <!-- 金 -->
+                <div class="flex flex-col">
+                    <label for="point-gold" class="text-sm font-medium text-gray-600">金</label>
+                    <input type="number" id="point-gold" value="100" min="10" max="500" class="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-center">
+                </div>
+                <!-- 銀 -->
+                <div class="flex flex-col">
+                    <label for="point-silver" class="text-sm font-medium text-gray-600">銀</label>
+                    <input type="number" id="point-silver" value="50" min="10" max="500" class="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-center">
+                </div>
+                <!-- 銅 -->
+                <div class="flex flex-col">
+                    <label for="point-bronze" class="text-sm font-medium text-gray-600">銅</label>
+                    <input type="number" id="point-bronze" value="30" min="10" max="500" class="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-center">
+                </div>
+                <!-- 鐵 -->
+                <div class="flex flex-col">
+                    <label for="point-iron" class="text-sm font-medium text-gray-600">鐵</label>
+                    <input type="number" id="point-iron" value="20" min="10" max="500" class="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-center">
+                </div>
+            </div>
+        </div>
+
+        <!-- 遊戲介面區塊 -->
+        <div id="gameInterface" class="bg-gray-50 p-6 rounded-2xl border border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">計分板</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">洞數</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">成績</th>
+                            <th id="player-header-0" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">玩家1</th>
+                            <th id="player-header-1" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">玩家2</th>
+                            <th id="player-header-2" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">玩家3</th>
+                            <th id="player-header-3" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">玩家4</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoreTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- 分數輸入列將由 JS 插入 -->
+                    </tbody>
+                    <tfoot class="bg-gray-100">
+                        <tr>
+                            <td class="px-3 py-3 text-left text-sm font-medium text-gray-900">目前總計</td>
+                            <td class="px-3 py-3 text-left text-sm font-medium text-gray-900"></td>
+                            <td id="running-score-0" class="px-3 py-3 text-left text-sm font-medium text-gray-900">0</td>
+                            <td id="running-score-1" class="px-3 py-3 text-left text-sm font-medium text-gray-900">0</td>
+                            <td id="running-score-2" class="px-3 py-3 text-left text-sm font-medium text-gray-900">0</td>
+                            <td id="running-score-3" class="px-3 py-3 text-left text-sm font-medium text-gray-900">0</td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-3 text-left text-sm font-bold text-gray-900">最終總計</td>
+                            <td class="px-3 py-3 text-left text-sm font-medium text-gray-900"></td>
+                            <td id="total-score-0" class="px-3 py-3 text-left text-sm font-bold text-gray-900">0</td>
+                            <td id="total-score-1" class="px-3 py-3 text-left text-sm font-bold text-gray-900">0</td>
+                            <td id="total-score-2" class="px-3 py-3 text-left text-sm font-bold text-gray-900">0</td>
+                            <td id="total-score-3" class="px-3 py-3 text-left text-sm font-bold text-gray-900">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化變數
+        const playerCount = 4; // 玩家人數固定為4
+        const totalHoles = 18; // 洞數固定為18洞
+        let pointValues = {
+            '切': 150,
+            '金': 100,
+            '銀': 50,
+            '銅': 30,
+            '鐵': 20,
+            '無': 0
+        };
+        let playerScores = Array.from({ length: totalHoles }, () => Array(4).fill('無')); // 儲存每洞的成績
+        let playerNames = ['玩家1', '玩家2', '玩家3', '玩家4'];
+
+        const resultTypes = ['切', '金', '銀', '銅', '鐵', '無'];
+
+        // DOM 元素
+        const pointInputs = document.querySelectorAll('#pointSettingsSection input[type="number"]');
+        const scoreTableBody = document.getElementById('scoreTableBody');
+        const playerNameInputsContainer = document.getElementById('playerNameInputs');
+
+        // 渲染玩家姓名輸入欄位
+        function renderPlayerNameInputs() {
+            playerNameInputsContainer.innerHTML = '';
+            for (let i = 0; i < playerCount; i++) {
+                playerNameInputsContainer.innerHTML += `
+                    <div class="flex flex-col">
+                        <label for="player-name-${i}" class="text-sm font-medium text-gray-600">玩家 ${i + 1} 姓名</label>
+                        <input type="text" id="player-name-${i}" value="${playerNames[i]}" class="mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm">
+                    </div>
+                `;
+            }
+            // 監聽姓名變更
+            for (let i = 0; i < playerCount; i++) {
+                document.getElementById(`player-name-${i}`).addEventListener('input', (e) => {
+                    playerNames[i] = e.target.value;
+                    renderScoreTable();
+                    updateScoreboard();
+                });
+            }
+        }
+
+        // 渲染包含輸入欄位的計分表格
+        function renderScoreTable() {
+            // 根據玩家人數調整表頭和總分行的顯示
+            for (let i = 0; i < playerCount; i++) {
+                const header = document.getElementById(`player-header-${i}`);
+                header.textContent = playerNames[i];
+            }
+
+            scoreTableBody.innerHTML = '';
+            for (let hole = 1; hole <= totalHoles; hole++) {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50';
+                
+                // 洞數
+                const holeCell = document.createElement('td');
+                holeCell.className = 'px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900';
+                holeCell.textContent = `第 ${hole} 洞`;
+                tr.appendChild(holeCell);
+
+                // 成績輸入
+                const scoreInputCell = document.createElement('td');
+                scoreInputCell.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-500';
+                for (let i = 0; i < playerCount; i++) {
+                    const select = document.createElement('select');
+                    select.className = `w-1/4 inline-block px-1 py-1 bg-white border border-gray-300 rounded-md shadow-sm text-sm mr-1 player-score-select`;
+                    select.setAttribute('data-hole', hole);
+                    select.setAttribute('data-player', i);
+
+                    // 填充選項
+                    resultTypes.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type;
+                        option.textContent = type;
+                        if (playerScores[hole - 1][i] === type) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+
+                    // 監聽變更事件
+                    select.addEventListener('change', (e) => {
+                        const h = parseInt(e.target.dataset.hole);
+                        const p = parseInt(e.target.dataset.player);
+                        playerScores[h - 1][p] = e.target.value;
+                        updateScoreboard();
+                    });
+
+                    scoreInputCell.appendChild(select);
+                }
+                tr.appendChild(scoreInputCell);
+
+                // 玩家得分
+                for (let i = 0; i < playerCount; i++) {
+                    const scoreCell = document.createElement('td');
+                    scoreCell.id = `hole-${hole}-player-${i}-score`;
+                    scoreCell.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-500';
+                    tr.appendChild(scoreCell);
+                }
+
+                scoreTableBody.appendChild(tr);
+            }
+        }
+
+        // 渲染計分板
+        function updateScoreboard() {
+            const playerTotals = Array(playerCount).fill(0);
+
+            for (let i = 1; i <= totalHoles; i++) {
+                const holeScores = calculateHoleScores(i);
+                
+                holeScores.scores.forEach((score, index) => {
+                    playerTotals[index] += score;
+                    const scoreElement = document.getElementById(`hole-${i}-player-${index}-score`);
+                    if (scoreElement) {
+                        // 顯示詳細計算
+                        scoreElement.innerHTML = `${score} <br> <span class="text-xs text-gray-400">(${holeScores.breakdown[index]})</span>`;
+                    }
+                });
+            }
+
+            // 更新總分
+            for (let i = 0; i < playerCount; i++) {
+                document.getElementById(`total-score-${i}`).textContent = playerTotals[i];
+                document.getElementById(`running-score-${i}`).textContent = playerTotals[i];
+            }
+        }
+
+        // 計算單洞分數與詳細過程
+        function calculateHoleScores(hole) {
+            const scores = Array(playerCount).fill(0);
+            const breakdown = Array(playerCount).fill('');
+            const holeResults = playerScores[hole - 1];
+
+            const winners = {};
+            resultTypes.slice(0, 5).forEach(type => {
+                winners[type] = [];
+            });
+            
+            holeResults.forEach((result, index) => {
+                if (result !== '無') {
+                    winners[result].push(index);
+                }
+            });
+
+            for (let i = 0; i < playerCount; i++) {
+                let playerScore = 0;
+                let pointsReceived = 0;
+                let pointsPaid = 0;
+                const otherPlayers = Array.from({ length: playerCount }, (_, j) => j).filter(j => j !== i);
+
+                for (const type in winners) {
+                    if (winners[type].includes(i)) {
+                        pointsReceived += (otherPlayers.length) * pointValues[type];
+                    }
+                }
+
+                for (const type in winners) {
+                    winners[type].forEach(winnerIndex => {
+                        if (winnerIndex !== i) {
+                            pointsPaid += pointValues[type];
+                        }
+                    });
+                }
+                
+                playerScore = pointsReceived - pointsPaid;
+                scores[i] = playerScore;
+                breakdown[i] = `${pointsReceived}-${pointsPaid}`;
+            }
+            return { scores, breakdown };
+        }
+
+        // 監聽分數設定的變更
+        pointInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                const type = input.id.split('-')[1];
+                switch (type) {
+                    case 'cut': pointValues['切'] = parseInt(input.value); break;
+                    case 'gold': pointValues['金'] = parseInt(input.value); break;
+                    case 'silver': pointValues['銀'] = parseInt(input.value); break;
+                    case 'bronze': pointValues['銅'] = parseInt(input.value); break;
+                    case 'iron': pointValues['鐵'] = parseInt(input.value); break;
+                }
+                updateScoreboard();
+            });
+        });
+
+        // 初始渲染
+        renderPlayerNameInputs();
+        renderScoreTable();
+        updateScoreboard();
+    </script>
+</body>
+</html>
